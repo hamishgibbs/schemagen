@@ -17,38 +17,40 @@ class SchemaParser():
                     continue
                 print(row)
                 if row[0] != '':
-                    self.graph.append(
-                        self.graphClass(
-                            label=row[0],
-                            superClass=row[1],
-                            comment=row[5]
-                        )
+                    # This should be abstracted
+                    graphClass = self.createGraphClass(
+                        label=row[0],
+                        superClass=row[1],
+                        comment=row[5]
                     )
+                    self.activeClass = graphClass["@id"]
+                    self.graph.append(graphClass)
                 elif row[2] != '':
                     # Put this propery on the activeClass
-                    self.graph.append(
-                        self.graphProperty(
-                            label=row[2],
-                            valueType=row[4],
-                            comment=row[5]
-                        )
+                    graphProperty = self.createGraphProperty(
+                        label=row[2],
+                        valueType=row[4],
+                        comment=row[5]
                     )
+                    self.activeProperty = graphProperty["@id"]
+                    self.graph.append(graphProperty)
+                    self.appendPropertyToActiveClass(graphProperty["@id"])
                 elif row[3] != '':
                     # Put this Annotation on the activeProperty
-                    self.graph.append(
-                        self.graphAnnotation(
-                            label=row[3],
-                            valueType=row[4],
-                            comment=row[5]
-                        )
+                    graphAnnotation = self.createGraphAnnotation(
+                        label=row[3],
+                        valueType=row[4],
+                        comment=row[5]
                     )
+                    self.graph.append(graphAnnotation)
+                    self.appendAnnotationToActiveProperty(graphAnnotation["@id"])
                 else:
                     pass
 
     def appendBaseUrl(self, label):
         return self.baseUrl + '/' + label
 
-    def graphClass(self,
+    def createGraphClass(self,
                    label,
                    superClass,
                    comment):
@@ -67,7 +69,7 @@ class SchemaParser():
 
         return node
 
-    def graphProperty(self,
+    def createGraphProperty(self,
                       label,
                       valueType,
                       comment):
@@ -81,7 +83,7 @@ class SchemaParser():
 
         return node
 
-    def graphAnnotation(self,
+    def createGraphAnnotation(self,
                         label,
                         valueType,
                         comment):
@@ -93,3 +95,20 @@ class SchemaParser():
                 "range": valueType}
 
         return node
+
+    def graphIndexByNodeID(self, id):
+
+        activeClassIndex = [
+            i for i, x in enumerate(self.graph) if x["@id"] == id
+        ]
+        return activeClassIndex[0]
+
+    def appendPropertyToActiveClass(self, graphPropertyId):
+
+        activeClassIndex = self.graphIndexByNodeID(self.activeClass)
+        self.graph[activeClassIndex]["properties"].append(graphPropertyId)
+
+    def appendAnnotationToActiveProperty(self, graphAnnotationId):
+
+        activePropertyIndex = self.graphIndexByNodeID(self.activeProperty)
+        self.graph[activePropertyIndex]["annotations"].append(graphAnnotationId)
