@@ -25,7 +25,7 @@
       "@type": "rdf:Property",
       "rdfs:comment": "(Description)",
       "rdfs:label": "brand",
-      "hamish:hasAnnotation": [
+      "hamish:annotations": [
         "@id": "hamish:enrollmentDate"
       ]
     },
