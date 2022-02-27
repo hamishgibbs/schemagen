@@ -1,0 +1,38 @@
+
+{
+  "@context": {
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "schema": "https://schema.org/",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "hamish": "go.fuck.yourself.com"
+  },
+  "@graph": [
+    {
+      "@id": "schema:NewsMediaOrganization",
+      "@type": "rdfs:Class",
+      "rdfs:comment": "(description)",
+      "rdfs:label": "NewsMediaOrganization",
+      "rdfs:subClassOf": {
+        "@id": "schema:Organization"
+      },
+      "hamish:properties": [
+        "@id": "schema:brand"
+      ]
+    },
+    {
+      "@id": "schema:brand",
+      "@type": "rdf:Property",
+      "rdfs:comment": "(Description)",
+      "rdfs:label": "brand",
+      "hamish:hasAnnotation": [
+        "@id": "hamish:enrollmentDate"
+      ]
+    },
+    {
+      "@id": "hamish:enrollmentDate",
+      "@type": "hamish:Annotation",
+      "rdfs:comment": "(Description)",
+      "rdfs:label": "enrollmentDate",
+    }
+}
