@@ -1,5 +1,5 @@
 import csv
-
+import json
 
 class SchemaParser():
     def __init__(self, baseUrl):
@@ -112,3 +112,6 @@ class SchemaParser():
 
         activePropertyIndex = self.graphIndexByNodeID(self.activeProperty)
         self.graph[activePropertyIndex]["annotations"].append(graphAnnotationId)
+
+    def pprintGraph(self):
+        print(json.dumps(self.graph, sort_keys=True, indent=4))

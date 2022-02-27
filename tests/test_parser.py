@@ -7,7 +7,7 @@ def test_SchemaParser():
 
     parser.parse_csv_schema("data/schema.csv")
 
-    print(parser.graph)
+    print(parser.pprintGraph())
 
     assert False
 
