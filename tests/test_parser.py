@@ -10,3 +10,5 @@ def test_SchemaParser():
     print(parser.graph)
 
     assert False
+
+# There need to be lots of tests for every key value pair
