@@ -10,87 +10,74 @@ class SchemaParser():
 
     def parse_csv_schema(self, reader):
 
-        for i, row in enumerate(reader):
+        for i, csvRow in enumerate(reader):
             if i == 0:
                 continue
-            print(row)
-            if row[0] != '':
-                # This should be abstracted
-                graphClass = self.createGraphClass(
-                    label=row[0],
-                    superClass=row[1],
-                    comment=row[5]
-                )
+            row = self.parseSchemaRow(csvRow)
+
+            if row['class'] != '':
+                graphClass = self.createGraphClass(row)
                 self.activeClass = graphClass["@id"]
                 self.graph.append(graphClass)
-            elif row[2] != '':
-                # Put this propery on the activeClass
-                graphProperty = self.createGraphProperty(
-                    label=row[2],
-                    valueType=row[4],
-                    comment=row[5]
-                )
+            elif row['property'] != '':
+                graphProperty = self.createGraphProperty(row)
                 self.activeProperty = graphProperty["@id"]
                 self.graph.append(graphProperty)
                 self.appendPropertyToActiveClass(graphProperty["@id"])
-            elif row[3] != '':
-                # Put this Annotation on the activeProperty
-                graphAnnotation = self.createGraphAnnotation(
-                    label=row[3],
-                    valueType=row[4],
-                    comment=row[5]
-                )
+            elif row['annotation'] != '':
+                graphAnnotation = self.createGraphAnnotation(row)
                 self.graph.append(graphAnnotation)
                 self.appendAnnotationToActiveProperty(graphAnnotation["@id"])
             else:
                 pass
 
+    def parseSchemaRow(self, row):
+        return {
+            'class': row[0],
+            'superClass': row[1],
+            'property': row[2],
+            'annotation': row[3],
+            'valueType': row[4],
+            'comment': row[5]}
+
     def appendBaseUrl(self, label):
-        return "schema/" + label
+        return "schema:" + label
 
-    def createGraphClass(self,
-                   label,
-                   superClass,
-                   comment):
+    def createGraphClass(self, row):
 
-        node = {"@id": self.appendBaseUrl(label),
+        node = {"@id": self.appendBaseUrl(row["class"]),
                 "@type": "rdfs:Class",
-                "rdfs:comment": comment,
-                "rdfs:label": label,
+                "rdfs:comment": row["comment"],
+                "rdfs:label": row["class"],
                 "ns:properties": []}
 
-        if superClass != '':
+        if row["superClass"] != '':
             node["rdfs:subClassOf"] = {
                # DEV: Currently cannot use definitions in other schemas
-               "@id": self.appendBaseUrl(label)
+               # DEV: Can only be a subclass of one type
+               "@id": self.appendBaseUrl(row["superClass"])
             }
 
         return node
 
-    def createGraphProperty(self,
-                      label,
-                      valueType,
-                      comment):
+    def createGraphProperty(self, row):
 
-        node = {"@id": self.appendBaseUrl(label),
+        node = {"@id": self.appendBaseUrl(row["property"]),
                 "@type": "rdfs:Property",
-                "rdfs:comment": comment,
-                "rdfs:label": label,
+                "rdfs:comment": row["comment"],
+                "rdfs:label": row["property"],
                 "ns:annotations": [],
-                "ns:range": valueType}
+                "ns:range": row["valueType"]}
 
         return node
 
-    def createGraphAnnotation(self,
-                        label,
-                        valueType,
-                        comment):
+    def createGraphAnnotation(self, row):
 
-        node = {"@id": self.appendBaseUrl(label),
+        node = {"@id": self.appendBaseUrl(row["annotation"]),
                 "@type": "Annotation",
-                "rdfs:comment": comment,
-                "rdfs:label": label,
-                "ns:range": valueType}
+                "rdfs:comment": row["comment"],
+                "rdfs:label": row["annotation"],
+                "ns:range": row["valueType"]}
 
         return node
 
