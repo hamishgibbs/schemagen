@@ -76,7 +76,7 @@ class SchemaParser():
     def createGraphAnnotation(self, row):
 
         node = {"@id": self.appendBaseUrl(row["annotation"]),
-                "@type": "Annotation",
+                "@type": "ns:Annotation",
                 "rdfs:comment": row["comment"],
                 "rdfs:label": row["annotation"],
                 "ns:range": row["valueType"]}

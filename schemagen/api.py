@@ -29,6 +29,16 @@ def propertyDataForTable(property):
 async def root():
     return {"message": "Hello World"}
 
+def getGraphClassProperties(graphClass, properties={}):
+    properties[graphClass["@id"]] = graphClass["ns:properties"]
+    try:
+        superClass = graphClass["rdfs:subClassOf"]["@id"]
+        getGraphClassProperties(schema.graph[schema.graphIndexByNodeID(superClass)], properties)
+    except:
+        pass
+    return properties
+
+
 @app.get("/{node}", response_class=HTMLResponse)
 async def root(request: Request, node: str):
     node = schema.graph[schema.graphIndexByNodeID("schema:" + node)]
@@ -37,12 +47,19 @@ async def root(request: Request, node: str):
         "label": node["rdfs:label"],
         "type": schema.removeKeyContext(node["@type"]),
         "comment": node["rdfs:comment"]}
-
-    if schema.removeKeyContext(node["@type"]) in ["Class"]:
+    if schema.removeKeyContext(node["@type"]) == "Class":
+        # DEV: Add here for inherited properties up the chain
+        getGraphClassProperties(node)
         property_indices = [schema.graphIndexByNodeID(x) for x in node["ns:properties"]]
         properties = [propertyDataForTable(schema.graph[i]) for i in property_indices]
         response_context["properties"] = properties
-        # DEV: Add here for inherited properties up the chain
+        return templates.TemplateResponse("node.html",
+            response_context)
+
+    elif schema.removeKeyContext(node["@type"]) == "Property":
+        annotation_indices = [schema.graphIndexByNodeID(x) for x in node["ns:annotations"]]
+        annotations = [propertyDataForTable(schema.graph[i]) for i in annotation_indices]
+        response_context["properties"] = annotations
         return templates.TemplateResponse("node_with_properties.html",
             response_context)
     else:
