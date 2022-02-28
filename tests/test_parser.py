@@ -81,14 +81,11 @@ def test_graphAsJSONLD_context(parserFactory):
     }
     assert parserFactory.graphAsJSONLD() == expectedJSONLD
 
-def test_SchemaParser():
-
-    parser = SchemaParser("gfy.org")
-
+def test_SchemaParser(parserFactory):
     with open("data/schema.csv") as f:
         reader = csv.reader(f)
-        parser.parse_csv_schema(reader)
+        parserFactory.parse_csv_schema(reader)
 
-    print(parser.pprintGraph())
+    print(parserFactory.pprintGraph())
 
     assert True
