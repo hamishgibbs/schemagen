@@ -2,15 +2,20 @@
 <html lang="en">
 <head>
     {% block head %}
+    <link rel="stylesheet" href="static/style.css" />
     <title>{% block title %}{% endblock %} - Generated Schema</title>
     {% endblock %}
 </head>
 <body>
     <div id="content">
+      <h1>Generated Schema</h1>
       {% block content %}
-      <h1>{{ label }}</h1>
-      <p>{{ type }}</p>
-      <p>{{ comment }}</p>
+        <h1>{{ label }}</h1>
+        <p>{{ type }}</p>
+        <p>{{ comment }}</p>
+      {% endblock %}
+      {% block jsonld %}
+        <script type="application/ld+json">{{ JSONLD | safe }}</script>
       {% endblock %}
     </div>
 </body>

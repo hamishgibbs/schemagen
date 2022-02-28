@@ -1,11 +1,12 @@
 {% extends "base.html" %}
 {% block title %}{{ label }}{% endblock %}
 {% block content %}
-  <h1>{{ label }}</h1>
+  <h2>{{ label }}</h2>
   <p>{{ type }}</p>
   <p>{{ comment }}</p>
   {% for group in properties %}
-      <h2>Properties from type <a href="{{ group['link'] }}">{{ group["label"] }}</a></h2>
+    {% if group["properties"] != [] %}
+      <h3>Properties from type <a href="{{ group['link'] }}">{{ group["label"] }}</a></h3>
       <table>
         <tr>
           <th>Label</th>
@@ -18,7 +19,8 @@
           <td>{{ property["range"] }}</td>
           <td>{{ property["comment"] }}</td>
         </tr>
-      </table>
     {% endfor %}
+    </table>
+    {% endif %}
   {% endfor %}
 {% endblock %}

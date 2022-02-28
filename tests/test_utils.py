@@ -52,11 +52,3 @@ def test_getGraphClassProperties_dependent(parserFactory, dependentClassGraph):
          "link": "gfy.org/Company",
          "properties": ["cp1", "cp2"]}
     ]
-
-def test_getClassDependencyDepth(parserFactory, dependentClassGraph):
-    parserFactory.graph = dependentClassGraph
-    res = getClassDependencyDepth(
-        schema=parserFactory,
-        nodeId="schema:SmallBusiness",
-        start=[])
-    assert res == 1
