@@ -1,11 +1,15 @@
+import csv
 from schemagen.parser import (
     SchemaParser
 )
 
 def test_SchemaParser():
+
     parser = SchemaParser("gfy.org")
 
-    parser.parse_csv_schema("data/schema.csv")
+    with open("data/schema.csv") as f:
+        reader = csv.reader(f)
+        parser.parse_csv_schema(reader)
 
     print(parser.pprintGraph())
 
