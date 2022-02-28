@@ -6,7 +6,7 @@ from schemagen.parser import (
 
 @pytest.fixture()
 def parserFactory():
-    return SchemaParser("gfy.org")
+    return SchemaParser("gfy.org/")
 
 
 def test_parseSchemaRow(parserFactory):
@@ -29,7 +29,6 @@ def test_createGraphClass_noninherited(parserFactory):
 
     with pytest.raises(KeyError):
         res["rdfs:subClassOf"]
-
 
 def test_createGraphClass_inherited(parserFactory):
     inputRow = {"class": "Person", "comment": "A Person", "superClass":'Thing'}
@@ -76,22 +75,27 @@ def test_graphAsJSONLD_context(parserFactory):
             "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
             "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
             "ns": "non-standard-convenience-properties",
-            "schema": "gfy.org"
+            "schema": "gfy.org/"
             },
         "@graph": [{"@id": "schema:Animal"}]
     }
     assert parserFactory.graphAsJSONLD() == expectedJSONLD
 
-def test_SchemaParser():
+def test_resolveKeyContext(parserFactory):
+    parserFactory.graph = [{"@id": "schema:Animal"}]
+    res = parserFactory.resolveKeyContext("schema:Animal")
+    assert res == 'gfy.org/Animal'
 
-    parser = SchemaParser("gfy.org")
+def test_removeKeyContext(parserFactory):
+    res = parserFactory.removeKeyContext("schema:Animal")
+    assert res == "Animal"
 
+
+def test_SchemaParser(parserFactory):
     with open("data/schema.csv") as f:
         reader = csv.reader(f)
-        parser.parse_csv_schema(reader)
+        parserFactory.parse_csv_schema(reader)
 
-    # print(parser.pprintGraph())
+    print(parserFactory.pprintJSON(parserFactory.JSONLD))
 
     assert True
-
-# There need to be lots of tests for every key value pair

@@ -1,12 +1,14 @@
-import csv
 import json
 
+# I think this is actually not a SchemaParser but should instead
+# be two objects - a schema parser and a schema
 class SchemaParser():
     def __init__(self, baseUrl):
         self.baseUrl = baseUrl
         self.activeClass = None
         self.activeProperty = None
         self.graph = []
+        self.JSONLD = self.graphAsJSONLD()
 
     def parse_csv_schema(self, reader):
 
@@ -74,7 +76,7 @@ class SchemaParser():
     def createGraphAnnotation(self, row):
 
         node = {"@id": self.appendBaseUrl(row["annotation"]),
-                "@type": "Annotation",
+                "@type": "ns:Annotation",
                 "rdfs:comment": row["comment"],
                 "rdfs:label": row["annotation"],
                 "ns:range": row["valueType"]}
@@ -82,11 +84,10 @@ class SchemaParser():
         return node
 
     def graphIndexByNodeID(self, id):
-
-        activeClassIndex = [
+        nodeIndex = [
             i for i, x in enumerate(self.graph) if x["@id"] == id
         ]
-        return activeClassIndex[0]
+        return nodeIndex[0]
 
     def appendPropertyToActiveClass(self, graphPropertyId):
 
@@ -98,8 +99,8 @@ class SchemaParser():
         activePropertyIndex = self.graphIndexByNodeID(self.activeProperty)
         self.graph[activePropertyIndex]["ns:annotations"].append(graphAnnotationId)
 
-    def pprintGraph(self):
-        print(json.dumps(self.graphAsJSONLD(), sort_keys=True, indent=4))
+    def pprintJSON(self, data):
+        print(json.dumps(data, sort_keys=True, indent=4))
 
     def graphAsJSONLD(self):
         jsonData = {"@context": {
@@ -113,5 +114,10 @@ class SchemaParser():
           }
         return jsonData
 
-    def graphAsHTML(self):
-        return False
+    def resolveKeyContext(self, key):
+        prefix, label = key.split(":")
+        return self.JSONLD["@context"][prefix] + label
+
+    def removeKeyContext(self, key):
+        prefix, label = key.split(":")
+        return label

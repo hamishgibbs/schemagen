@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}{{ label }}{% endblock %}
+{% block content %}
+  <h1>{{ label }}</h1>
+  <p>{{ type }}</p>
+  <p>{{ comment }}</p>
+  {% if properties != [] %}
+  <table>
+    <tr>
+      <th>Label</th>
+      <th>Expected Type</th>
+      <th>Description</th>
+    </tr>
+    {% for item in properties %}
+    <tr>
+      <td><a href="{{ item['link'] }}">{{ item["label"] }}</a></td>
+      <td>{{ item["range"] }}</td>
+      <td>{{ item["comment"] }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% endif %}
+{% endblock %}
