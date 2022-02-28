@@ -48,7 +48,7 @@ class SchemaParser():
                     pass
 
     def appendBaseUrl(self, label):
-        return self.baseUrl + '/' + label
+        return "schema/" + label
 
     def createGraphClass(self,
                    label,
@@ -59,7 +59,7 @@ class SchemaParser():
                 "@type": "rdfs:Class",
                 "rdfs:comment": comment,
                 "rdfs:label": label,
-                "properties": []}
+                "ns:properties": []}
 
         if superClass != '':
             node["rdfs:subClassOf"] = {
@@ -78,8 +78,8 @@ class SchemaParser():
                 "@type": "rdfs:Property",
                 "rdfs:comment": comment,
                 "rdfs:label": label,
-                "annotations": [],
-                "range": valueType}
+                "ns:annotations": [],
+                "ns:range": valueType}
 
         return node
 
@@ -92,7 +92,7 @@ class SchemaParser():
                 "@type": "Annotation",
                 "rdfs:comment": comment,
                 "rdfs:label": label,
-                "range": valueType}
+                "ns:range": valueType}
 
         return node
 
@@ -106,12 +106,27 @@ class SchemaParser():
     def appendPropertyToActiveClass(self, graphPropertyId):
 
         activeClassIndex = self.graphIndexByNodeID(self.activeClass)
-        self.graph[activeClassIndex]["properties"].append(graphPropertyId)
+        self.graph[activeClassIndex]["ns:properties"].append(graphPropertyId)
 
     def appendAnnotationToActiveProperty(self, graphAnnotationId):
 
         activePropertyIndex = self.graphIndexByNodeID(self.activeProperty)
-        self.graph[activePropertyIndex]["annotations"].append(graphAnnotationId)
+        self.graph[activePropertyIndex]["ns:annotations"].append(graphAnnotationId)
 
     def pprintGraph(self):
-        print(json.dumps(self.graph, sort_keys=True, indent=4))
+        print(json.dumps(self.graphAsJSONLD(), sort_keys=True, indent=4))
+
+    def graphAsJSONLD(self):
+        jsonData = {"@context": {
+            "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+            "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+            # Replace this with a base document embedded in the schema
+            "ns:ns": "non-standard-convenience-properties",
+            "schema": self.baseUrl
+          },
+          "@graph": self.graph
+          }
+        return jsonData
+
+    def graphAsHTML(self):
+        return False
