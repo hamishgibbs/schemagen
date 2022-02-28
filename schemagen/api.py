@@ -4,6 +4,10 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from schemagen.parser import SchemaParser
+from schemagen.utils import (
+    getGraphClassProperties,
+    classPropertyDataForTable
+)
 
 app = FastAPI()
 
@@ -17,26 +21,9 @@ with open("data/schema.csv") as f:
     reader = csv.reader(f)
     schema.parse_csv_schema(reader)
 
-def propertyDataForTable(property):
-    return {
-        "label": property["rdfs:label"],
-        "link": schema.resolveKeyContext(property["@id"]),
-        "range": property["ns:range"],
-        "comment": property["rdfs:comment"]
-    }
-
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
-
-def getGraphClassProperties(graphClass, properties={}):
-    properties[graphClass["@id"]] = graphClass["ns:properties"]
-    try:
-        superClass = graphClass["rdfs:subClassOf"]["@id"]
-        getGraphClassProperties(schema.graph[schema.graphIndexByNodeID(superClass)], properties)
-    except:
-        pass
-    return properties
 
 
 @app.get("/{node}", response_class=HTMLResponse)
@@ -47,12 +34,10 @@ async def root(request: Request, node: str):
         "label": node["rdfs:label"],
         "type": schema.removeKeyContext(node["@type"]),
         "comment": node["rdfs:comment"]}
+
     if schema.removeKeyContext(node["@type"]) == "Class":
-        # DEV: Add here for inherited properties up the chain
-        getGraphClassProperties(node)
-        property_indices = [schema.graphIndexByNodeID(x) for x in node["ns:properties"]]
-        properties = [propertyDataForTable(schema.graph[i]) for i in property_indices]
-        response_context["properties"] = properties
+        response_context["properties"] = classPropertyDataForTable(
+            schema=schema, node=node)
         return templates.TemplateResponse("node.html",
             response_context)
 

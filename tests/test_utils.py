@@ -25,7 +25,10 @@ def test_getGraphClassProperties(parserFactory, dependentClassGraph):
         {"@id": "schema:Organisation",
          "ns:properties": ["op1", "op2"]})
 
-    assert res == {"schema:Organisation": ["op1", "op2"]}
+    assert res == [
+        {"@id": "schema:Organisation",
+         "properties": ["op1", "op2"]}
+    ]
 
 def test_getGraphClassProperties_dependent(parserFactory, dependentClassGraph):
     parserFactory.graph = dependentClassGraph
@@ -34,5 +37,9 @@ def test_getGraphClassProperties_dependent(parserFactory, dependentClassGraph):
          "rdfs:subClassOf": "schema:Organisation",
          "ns:properties": ["cp1", "cp2"]})
 
-    assert res == {"schema:Organisation": ["op1", "op2"],
-                   "schema:Company": ["cp1", "cp2"]}
+    assert res == [
+        {"@id": "schema:Organisation",
+         "properties": ["op1", "op2"]},
+        {"@id": "schema:Company",
+         "properties": ["cp1", "cp2"]}
+    ]
