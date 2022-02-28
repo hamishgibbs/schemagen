@@ -4,6 +4,7 @@
   <h1>{{ label }}</h1>
   <p>A {{ type }}</p>
   <p>{{ comment }}</p>
+  {% if properties != [] %}
   <table>
     <tr>
       <th>Label</th>
@@ -18,4 +19,5 @@
     </tr>
     {% endfor %}
   </table>
+  {% endif %}
 {% endblock %}

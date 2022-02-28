@@ -2,7 +2,10 @@ import pytest
 from schemagen.parser import (
     SchemaParser
 )
-from schemagen.utils import getGraphClassProperties
+from schemagen.utils import (
+    getGraphClassProperties,
+    getClassDependencyDepth
+)
 
 @pytest.fixture()
 def parserFactory():
@@ -14,8 +17,11 @@ def dependentClassGraph():
         {"@id": "schema:Organisation",
          "ns:properties": ["op1", "op2"]},
         {"@id": "schema:Company",
-         "rdfs:subClassOf": "schema:Organisation",
-         "ns:properties": ["cp1", "cp2"]}
+         "rdfs:subClassOf": {"@id": "schema:Organisation"},
+         "ns:properties": ["cp1", "cp2"]},
+        {"@id": "schema:SmallBusiness",
+         "rdfs:subClassOf": {"@id": "schema:Company"},
+         "ns:properties": ["sb1", "sb2"]}
     ]
 
 
@@ -26,7 +32,8 @@ def test_getGraphClassProperties(parserFactory, dependentClassGraph):
          "ns:properties": ["op1", "op2"]})
 
     assert res == [
-        {"@id": "schema:Organisation",
+        {"label": "Organisation",
+         "link": "gfy.org/Organisation",
          "properties": ["op1", "op2"]}
     ]
 
@@ -38,8 +45,18 @@ def test_getGraphClassProperties_dependent(parserFactory, dependentClassGraph):
          "ns:properties": ["cp1", "cp2"]})
 
     assert res == [
-        {"@id": "schema:Organisation",
+        {"label": "Organisation",
+         "link": "gfy.org/Organisation",
          "properties": ["op1", "op2"]},
-        {"@id": "schema:Company",
+        {"label": "Company",
+         "link": "gfy.org/Company",
          "properties": ["cp1", "cp2"]}
     ]
+
+def test_getClassDependencyDepth(parserFactory, dependentClassGraph):
+    parserFactory.graph = dependentClassGraph
+    res = getClassDependencyDepth(
+        schema=parserFactory,
+        nodeId="schema:SmallBusiness",
+        start=[])
+    assert res == 1

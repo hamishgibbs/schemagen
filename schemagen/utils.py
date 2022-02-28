@@ -1,7 +1,15 @@
+def getClassDependencyDepth(schema, nodeId, start):
+    graphClass = schema.graph[schema.graphIndexByNodeID(nodeId)]
+    try:
+        getClassDependencyDepth(schema, graphClass["rdfs:subClassOf"]["@id"], start.append(1))
+    except Exception as e:
+        pass
+    return sum(start)
 
 def getGraphClassProperties(schema, graphClass, properties=[]):
     properties.append({
-        "@id": graphClass["@id"],
+        "label": schema.removeKeyContext(graphClass["@id"]),
+        "link": schema.resolveKeyContext(graphClass["@id"]),
         "properties": graphClass["ns:properties"]})
     try:
         superClass = graphClass["rdfs:subClassOf"]["@id"]
@@ -17,17 +25,27 @@ def getGraphClassProperties(schema, graphClass, properties=[]):
 
 def classPropertyDataForTable(schema, node):
 
-    classProperties = getGraphClassProperties(schema=schema, graphClass=node)
+    classProperties = getGraphClassProperties(schema=schema, graphClass=node,
+        properties=[])
 
-    res = []
+    tableContents = []
     for group in classProperties:
+        formattedGroup = group.copy()
         property_indices = [schema.graphIndexByNodeID(x) for x in group["properties"]]
-        group["properties"] = [propertyDataForTable(
+        formattedGroup["properties"] = [propertyDataForTable(
             schema=schema,
             property=schema.graph[i]) for i in property_indices]
-        res.append(group)
+        tableContents.append(formattedGroup)
 
-    return res
+    return tableContents
+
+def propertyAnnotationDataForTable(schema, node):
+    annotation_indices = [schema.graphIndexByNodeID(x) for x in node["ns:annotations"]]
+    annotations = [propertyDataForTable(
+        schema=schema,
+        property=schema.graph[i]) for i in annotation_indices]
+    return annotations
+
 
 def propertyDataForTable(schema, property):
     return {

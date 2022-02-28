@@ -84,11 +84,10 @@ class SchemaParser():
         return node
 
     def graphIndexByNodeID(self, id):
-
-        activeClassIndex = [
+        nodeIndex = [
             i for i, x in enumerate(self.graph) if x["@id"] == id
         ]
-        return activeClassIndex[0]
+        return nodeIndex[0]
 
     def appendPropertyToActiveClass(self, graphPropertyId):
 
@@ -100,8 +99,8 @@ class SchemaParser():
         activePropertyIndex = self.graphIndexByNodeID(self.activeProperty)
         self.graph[activePropertyIndex]["ns:annotations"].append(graphAnnotationId)
 
-    def pprintGraph(self):
-        print(json.dumps(self.graphAsJSONLD(), sort_keys=True, indent=4))
+    def pprintJSON(self, data):
+        print(json.dumps(data, sort_keys=True, indent=4))
 
     def graphAsJSONLD(self):
         jsonData = {"@context": {

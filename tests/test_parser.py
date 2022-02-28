@@ -96,6 +96,6 @@ def test_SchemaParser(parserFactory):
         reader = csv.reader(f)
         parserFactory.parse_csv_schema(reader)
 
-    print(parserFactory.pprintGraph())
+    print(parserFactory.pprintJSON(parserFactory.JSONLD))
 
     assert True

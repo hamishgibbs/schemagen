@@ -6,6 +6,12 @@
     {% endblock %}
 </head>
 <body>
-    <div id="content">{% block content %}{% endblock %}</div>
+    <div id="content">
+      {% block content %}
+      <h1>{{ label }}</h1>
+      <p>{{ type }}</p>
+      <p>{{ comment }}</p>
+      {% endblock %}
+    </div>
 </body>
 </html>

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}{{ label }}{% endblock %}
+{% block content %}
+  <h1>{{ label }}</h1>
+  <p>{{ type }}</p>
+  <p>{{ comment }}</p>
+  {% for group in properties %}
+      <h2>Properties from type <a href="{{ group['link'] }}">{{ group["label"] }}</a></h2>
+      <table>
+        <tr>
+          <th>Label</th>
+          <th>Expected Type</th>
+          <th>Description</th>
+        </tr>
+    {% for property in group["properties"] %}
+        <tr>
+          <td><a href="{{ property['link'] }}">{{ property["label"] }}</a></td>
+          <td>{{ property["range"] }}</td>
+          <td>{{ property["comment"] }}</td>
+        </tr>
+      </table>
+    {% endfor %}
+  {% endfor %}
+{% endblock %}
