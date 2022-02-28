@@ -12,10 +12,18 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="static/templates")
 
 # parse csv schema here
-schema = SchemaParser("http://127.0.0.1:8000")
+schema = SchemaParser("http://127.0.0.1:8000/")
 with open("data/schema.csv") as f:
     reader = csv.reader(f)
     schema.parse_csv_schema(reader)
+
+def propertyDataForTable(property):
+    return {
+        "label": property["rdfs:label"],
+        "link": schema.resolveKeyContext(property["@id"]),
+        "range": property["ns:range"],
+        "comment": property["rdfs:comment"]
+    }
 
 @app.get("/")
 async def root():
@@ -24,12 +32,22 @@ async def root():
 @app.get("/{node}", response_class=HTMLResponse)
 async def root(request: Request, node: str):
     node = schema.graph[schema.graphIndexByNodeID("schema:" + node)]
-    print(resolveKeyContext(node["@type"], schema.JSONLD["@context"]))
-    return templates.TemplateResponse("node.html",
-        {"request": request,
+
+    response_context = {"request": request,
         "label": node["rdfs:label"],
-        "type": node["@type"],
-        "comment": node["rdfs:comment"]})
+        "type": schema.removeKeyContext(node["@type"]),
+        "comment": node["rdfs:comment"]}
+
+    if schema.removeKeyContext(node["@type"]) in ["Class"]:
+        property_indices = [schema.graphIndexByNodeID(x) for x in node["ns:properties"]]
+        properties = [propertyDataForTable(schema.graph[i]) for i in property_indices]
+        response_context["properties"] = properties
+        # DEV: Add here for inherited properties up the chain
+        return templates.TemplateResponse("node_with_properties.html",
+            response_context)
+    else:
+        return templates.TemplateResponse("node.html",
+            response_context)
 
 def createItemPage():
         # Header (rdfs:label)

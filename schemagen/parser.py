@@ -118,3 +118,7 @@ class SchemaParser():
     def resolveKeyContext(self, key):
         prefix, label = key.split(":")
         return self.JSONLD["@context"][prefix] + label
+
+    def removeKeyContext(self, key):
+        prefix, label = key.split(":")
+        return label

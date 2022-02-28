@@ -86,6 +86,11 @@ def test_resolveKeyContext(parserFactory):
     res = parserFactory.resolveKeyContext("schema:Animal")
     assert res == 'gfy.org/Animal'
 
+def test_removeKeyContext(parserFactory):
+    res = parserFactory.removeKeyContext("schema:Animal")
+    assert res == "Animal"
+
+
 def test_SchemaParser(parserFactory):
     with open("data/schema.csv") as f:
         reader = csv.reader(f)
