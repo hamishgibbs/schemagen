@@ -58,12 +58,8 @@ async def index(request: Request):
             key=lambda k: (k['parent'], k['depth'], k['child']))
     #schema.pprintJSON(class_hierarchy)
 
-    classes = [{"label": x["rdfs:label"],
-    "link": schema.resolveKeyContext(x["@id"])}
-    for x in schema.graph if x["@type"] == "rdfs:Class"]
-
     response_context = {"request": request,
-        "classes": classes}
+        "classes": class_hierarchy}
 
     return templates.TemplateResponse("full.html",
         response_context)
