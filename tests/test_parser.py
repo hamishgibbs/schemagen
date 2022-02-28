@@ -6,7 +6,7 @@ from schemagen.parser import (
 
 @pytest.fixture()
 def parserFactory():
-    return SchemaParser("gfy.org")
+    return SchemaParser("gfy.org/")
 
 
 def test_parseSchemaRow(parserFactory):
@@ -75,11 +75,16 @@ def test_graphAsJSONLD_context(parserFactory):
             "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
             "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
             "ns": "non-standard-convenience-properties",
-            "schema": "gfy.org"
+            "schema": "gfy.org/"
             },
         "@graph": [{"@id": "schema:Animal"}]
     }
     assert parserFactory.graphAsJSONLD() == expectedJSONLD
+
+def test_resolveKeyContext(parserFactory):
+    parserFactory.graph = [{"@id": "schema:Animal"}]
+    res = parserFactory.resolveKeyContext("schema:Animal")
+    assert res == 'gfy.org/Animal'
 
 def test_SchemaParser(parserFactory):
     with open("data/schema.csv") as f:
@@ -88,4 +93,4 @@ def test_SchemaParser(parserFactory):
 
     print(parserFactory.pprintGraph())
 
-    assert False
+    assert True

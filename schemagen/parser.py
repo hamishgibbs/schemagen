@@ -115,6 +115,6 @@ class SchemaParser():
           }
         return jsonData
 
-    def resolveKeyContext(key):
+    def resolveKeyContext(self, key):
         prefix, label = key.split(":")
-        return schema.JSONLD["@context"][prefix] + label
+        return self.JSONLD["@context"][prefix] + label
