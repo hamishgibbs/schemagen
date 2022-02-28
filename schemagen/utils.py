@@ -1,3 +1,13 @@
+def getClassDependencyDepth(schema, nodeId, start):
+    graphClass = schema.graph[schema.graphIndexByNodeID(nodeId)]
+    try:
+        getClassDependencyDepth(schema=schema,
+            nodeId=graphClass["rdfs:subClassOf"]["@id"],
+            start=start.append(1))
+    except Exception as e:
+        pass
+    return sum(start)
+
 def getGraphClassProperties(schema, graphClass, properties=[]):
     properties.append({
         "label": schema.removeKeyContext(graphClass["@id"]),

@@ -8,7 +8,8 @@ from schemagen.parser import SchemaParser
 from schemagen.utils import (
     getGraphClassProperties,
     classPropertyDataForTable,
-    propertyAnnotationDataForTable
+    propertyAnnotationDataForTable,
+    getClassDependencyDepth
 )
 
 app = FastAPI()
@@ -23,12 +24,40 @@ with open("data/schema.csv") as f:
     reader = csv.reader(f)
     schema.parse_csv_schema(reader)
 
+with open("dist/schemas/schema.jsonld", "w") as f:
+    json.dump(schema.JSONLD, f, indent = 4)
+
 @app.get("/")
 async def root():
     return RedirectResponse("/full.html")
 
 @app.get("/full.html", response_class=HTMLResponse)
 async def index(request: Request):
+    # move this out of here
+    class_hierarchy = []
+    for node in schema.graph:
+        if node["@type"] != "rdfs:Class":
+            continue
+
+        try:
+            parentId = node["rdfs:subClassOf"]["@id"]
+        except:
+            parentId = node["@id"]
+        depth = getClassDependencyDepth(schema=schema,
+            nodeId=node["@id"], start=[])
+
+        class_hierarchy.append({
+            "parent": parentId,
+            "child": node["@id"],
+            "depth": depth,
+            "label": node["rdfs:label"],
+            "link": schema.resolveKeyContext(node["@id"])
+        })
+
+    class_hierarchy = sorted(class_hierarchy,
+            key=lambda k: (k['parent'], k['depth'], k['child']))
+    #schema.pprintJSON(class_hierarchy)
+
     classes = [{"label": x["rdfs:label"],
     "link": schema.resolveKeyContext(x["@id"])}
     for x in schema.graph if x["@type"] == "rdfs:Class"]
@@ -52,9 +81,6 @@ async def node_page(request: Request, node: str):
     if schema.removeKeyContext(node["@type"]) == "Class":
         response_context["properties"] = classPropertyDataForTable(
             schema=schema, node=node)
-        td = response_context.copy()
-        td.pop("request")
-        schema.pprintJSON(td)
         return templates.TemplateResponse("class.html",
             response_context)
     elif schema.removeKeyContext(node["@type"]) == "Property":
