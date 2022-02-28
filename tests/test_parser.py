@@ -69,6 +69,19 @@ def test_appendAnnotationToActiveProperty(parserFactory):
     parserFactory.appendAnnotationToActiveProperty("schema:enrollmentDate")
     assert len(parserFactory.graph[0]["ns:annotations"]) == 1
 
+def test_graphAsJSONLD_context(parserFactory):
+    parserFactory.graph = [{"@id": "schema:Animal"}]
+    expectedJSONLD = jsonData = {
+        "@context": {
+            "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+            "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+            "ns": "non-standard-convenience-properties",
+            "schema": "gfy.org"
+            },
+        "@graph": [{"@id": "schema:Animal"}]
+    }
+    assert parserFactory.graphAsJSONLD() == expectedJSONLD
+
 def test_SchemaParser():
 
     parser = SchemaParser("gfy.org")

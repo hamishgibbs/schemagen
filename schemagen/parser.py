@@ -106,7 +106,7 @@ class SchemaParser():
             "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
             "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
             # Replace this with a base document embedded in the schema
-            "ns:ns": "non-standard-convenience-properties",
+            "ns": "non-standard-convenience-properties",
             "schema": self.baseUrl
           },
           "@graph": self.graph
