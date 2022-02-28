@@ -30,7 +30,6 @@ def test_createGraphClass_noninherited(parserFactory):
     with pytest.raises(KeyError):
         res["rdfs:subClassOf"]
 
-
 def test_createGraphClass_inherited(parserFactory):
     inputRow = {"class": "Person", "comment": "A Person", "superClass":'Thing'}
     res = parserFactory.createGraphClass(inputRow)
@@ -90,8 +89,6 @@ def test_SchemaParser():
         reader = csv.reader(f)
         parser.parse_csv_schema(reader)
 
-    # print(parser.pprintGraph())
+    print(parser.pprintGraph())
 
     assert True
-
-# There need to be lots of tests for every key value pair
