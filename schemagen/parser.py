@@ -1,12 +1,14 @@
-import csv
 import json
 
+# I think this is actually not a SchemaParser but should instead
+# be two objects - a schema parser and a schema
 class SchemaParser():
     def __init__(self, baseUrl):
         self.baseUrl = baseUrl
         self.activeClass = None
         self.activeProperty = None
         self.graph = []
+        self.JSONLD = self.graphAsJSONLD()
 
     def parse_csv_schema(self, reader):
 
@@ -113,5 +115,6 @@ class SchemaParser():
           }
         return jsonData
 
-    def graphAsHTML(self):
-        return False
+    def resolveKeyContext(key):
+        prefix, label = key.split(":")
+        return schema.JSONLD["@context"][prefix] + label

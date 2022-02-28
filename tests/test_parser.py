@@ -88,4 +88,4 @@ def test_SchemaParser(parserFactory):
 
     print(parserFactory.pprintGraph())
 
-    assert True
+    assert False

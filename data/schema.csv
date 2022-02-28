@@ -1,4 +1,4 @@
-﻿class,super_class,property,annotation,value_type,comment,Synonyms
+﻿class,superClass,property,annotation,valueType,comment,Synonyms
 Person,,,,,,
 ,,born,,ISODate,,
 ,,spouse,,Person,,
@@ -33,7 +33,7 @@ Qualification,,,,,,
 ,,name,,text,"JD, PhD, BA, BS",
 ,,,,,,
 Acquisition,,,,,,
-,,buyer,,Organisation,,
-,,target,,Organisation,,
+,,acquirer,,Organisation,,
+,,acquisitionTarget,,Organisation,The target of an acquisition,
 ,,value,,float,,
 ,,date,,date,,
