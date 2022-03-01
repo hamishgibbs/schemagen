@@ -58,5 +58,5 @@ def test_getClassDependencyDepth(parserFactory, dependentClassGraph):
     res = getClassDependencyDepth(
         schema=parserFactory,
         nodeId="schema:SmallBusiness",
-        start=[])
-    assert res == 1
+        start=0)
+    assert res == 2

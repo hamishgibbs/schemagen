@@ -44,19 +44,19 @@ async def index(request: Request):
         except:
             parentId = node["@id"]
         depth = getClassDependencyDepth(schema=schema,
-            nodeId=node["@id"], start=[])
+            nodeId=node["@id"], start=0)
 
         class_hierarchy.append({
             "parent": parentId,
             "child": node["@id"],
-            "depth": depth,
+            "depth": 0,
             "label": node["rdfs:label"],
             "link": schema.resolveKeyContext(node["@id"])
         })
 
     class_hierarchy = sorted(class_hierarchy,
             key=lambda k: (k['parent'], k['depth'], k['child']))
-    #schema.pprintJSON(class_hierarchy)
+    schema.pprintJSON(class_hierarchy)
 
     response_context = {"request": request,
         "classes": class_hierarchy}
